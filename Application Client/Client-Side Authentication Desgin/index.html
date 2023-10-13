@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 300px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        label {
+            display: block;
+            margin: 10px 0;
+        }
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .error {
+            color: #ff0000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Login</h2>
+        <div class="error" id="error"></div>
+        <form id="loginForm">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+
+            <button type="submit">Login</button>
+        </form>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bcrypt/4.0.1/bcrypt.js"></script>
+    <script>
+        function showError(message) {
+            document.getElementById('error').textContent = message;
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (!username || !password) {
+                showError('Username and password are required.');
+                return;
+            }
+
+            bcrypt.hash(password, 10, function(err, hashedPassword) {
+                if (err) {
+                    showError('Error hashing password.');
+                    console.error(err);
+                    return;
+                }
+
+                // Send the username and hashed password to the server for authentication.
+                fetch('api_url', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password: hashedPassword }),
+                })
+                .then(response => {
+                    if (response.status === 200) {
+                        return response.json();
+                    } else {
+                        showError('Authentication failed. Please check your credentials.');
+                        throw new Error('Authentication failed');
+                    }
+                })
+                .then(data => {
+                    window.location.href = 'dashboard.html';
+                })
+                .catch(error => {
+                    showError('Authentication failed. Please check your credentials.');
+                    console.error(error);
+                });
+            });
+        }
+    </script>
+</body>
+</html>

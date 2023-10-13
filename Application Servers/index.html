@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Application Server</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 300px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        label {
+            display: block;
+            margin: 10px 0;
+        }
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .error {
+            color: #ff0000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>User Registration</h2>
+        <form id="registrationForm">
+            <label for="regUsername">Username:</label>
+            <input type="text" id="regUsername" name="regUsername" required>
+
+            <label for="regPassword">Password:</label>
+            <input type="password" id="regPassword" name="regPassword" required>
+
+            <button type="button" onclick="registerUser()">Register</button>
+        </form>
+    </div>
+
+    <div class="container">
+        <h2>User Login</h2>
+        <div class="error" id="loginError"></div>
+        <form id="loginForm">
+            <label for="loginUsername">Username:</label>
+            <input type="text" id="loginUsername" name="loginUsername" required>
+
+            <label for="loginPassword">Password:</label>
+            <input type="password" id="loginPassword" name="loginPassword" required>
+
+            <button type="button" onclick="authenticateUser()">Login</button>
+        </form>
+    </div>
+
+    <script>
+        function showError(elementId, message) {
+            document.getElementById(elementId).textContent = message;
+        }
+    
+        function registerUser() {
+            const username = document.getElementById('regUsername').value;
+            const password = document.getElementById('regPassword').value;
+    
+            fetch('/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, password }),
+            })
+            .then(response => {
+                if (response.status === 200) {
+                    showError('registrationError', 'Registration successful.');
+                } else {
+                    showError('registrationError', 'Registration failed. Please try again.');
+                }
+            })
+            .catch(error => {
+                showError('registrationError', 'An error occurred while registering.');
+            });
+        }
+    
+        function authenticateUser() {
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+    
+            fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, password }),
+            })
+            .then(response => {
+                if (response.status === 200) {
+                    window.location.href = '/dashboard.html';
+                } else {
+                    showError('loginError', 'Authentication failed. Please check your credentials.');
+                }
+            })
+            .catch(error => {
+                showError('loginError', 'An error occurred while authenticating.');
+            });
+        }
+    
+        function resetPassword() {
+            const email = document.getElementById('resetEmail').value;
+    
+            // Send a password reset request to your server and handle the response.
+            // You can use a similar fetch request as in registration and authentication.
+            // If reset is successful, show a message to the user.
+        }
+    
+        // Additional functions for session management, middleware, and other features can be added here.
+    
+    </script>
+</body>
+</html>
